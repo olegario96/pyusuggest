@@ -1,0 +1,8 @@
+setup.py
+pyusuggest/__init__.py
+pyusuggest/ubersuggest.py
+pyusuggest.egg-info/PKG-INFO
+pyusuggest.egg-info/SOURCES.txt
+pyusuggest.egg-info/dependency_links.txt
+pyusuggest.egg-info/not-zip-safe
+pyusuggest.egg-info/top_level.txt
