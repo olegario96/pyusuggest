@@ -2,10 +2,11 @@
 
 ## Introduction
 
-This package implements a simple class to integrate with amazing [Ubersuggest tool](https://neilpatel.com/
-ubersuggest/). But what is the UBersuggest tool anyway? It's a powerfull engine that can give statistics
-about keywords choosed by the user, taking as params the locale and the target of the search (i.e. web, YouTube,
-images). Unfortanelly, this tool doesn't have a native API, so I decide to contribute. Home made
+This package implements a simple class to integrate with amazing
+[Ubersuggest tool](https://neilpatel.com/ubersuggest/). But what is the Ubersuggest tool anyway?
+It's a powerfull engine that can give statistics about keywords choosed by the user, taking as
+params the locale and the target of the search (i.e. web, YouTube, images). Unfortanelly, this
+tool doesn't have a native API, so I decide to contribute. Home made.
 
 ## Index
 * [Installation](#installation)
