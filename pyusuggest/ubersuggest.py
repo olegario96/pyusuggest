@@ -74,10 +74,10 @@ class Ubersuggest(object):
         return 'Ubersuggest could not return competition for this keyword'
 
     def get_language_from_locale(self, locale):
-        return locale.split('-')[0]
+        return locale.lower().split('-')[0]
 
     def get_country_from_locale(self, locale):
-        return locale.split('-')[1]
+        return locale.lower().split('-')[1]
 
     def look_up(self, results=DEFAULT_RESULTS):
         if not self.google_keyword_planner and not self.google_suggest:
