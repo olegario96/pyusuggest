@@ -8,12 +8,16 @@ import requests
 
 class Ubersuggest(object):
     """
-        Ubersuggest implements a request
+        Ubersuggest implements a class that do requests to the service
     """
+    #: The default locale in the class
     DEFAULT_LOCALE = 'en-us'
+    #: Amount of results to be returned when query finishes.
     DEFAULT_RESULTS = 50
+    #: URL target to send the request. Already pre-formatted
     QUERY_URL = 'https://dk1ecw0kik.execute-api.us-east-1.amazonaws.com/prod/query?query={}&language={}&country={}&google=http://www.google.com&service=i'
-
+    #: Target area of the query. This options came from the own Ubersuggest
+    #: tool.
     AREA = {
         'web':      'Web',
         'image':    'Image',
@@ -23,6 +27,10 @@ class Ubersuggest(object):
     }
 
     def __init__(self, keyword, area=AREA['web'], locale=DEFAULT_LOCALE):
+        """
+            Create a class with necessary params to use Ubersuggest service
+            and an attribute to store the result of the query
+        """
         self.keyword = keyword
         self.area = area
         self.language = self.get_language_from_locale(locale)
