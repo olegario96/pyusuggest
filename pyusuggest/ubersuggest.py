@@ -139,17 +139,37 @@ class Ubersuggest(object):
         else:
             return self.results[:results]
 
-    def filter_results(self, filter):
-        # TODO
+    def filter_results(self, filters):
+        """
+            Filter current results with new keywords. This method is only available
+            after look_up be triggered.
+        """
         if not self.results:
             raise LookupNotExecuted('Can not filter results without executing look up')
-        pass
+
+        new_results = []
+        for filter in filters:
+            for key in self.results:
+                if filter in key['keyword']:
+                    new_results.append(key)
+
+        return new_results
 
     def filter_with_negative_keywords(self, negative_keywords):
-        # TODO
+        """
+            Filter current results with keywords that must not be in the results.
+            This method is only available after look_up be triggered.
+        """
         if not self.results:
             raise LookupNotExecuted('Can not filter negative keywords without executing look up')
-        pass
+
+        new_results = []
+        for keyword in negative_keywords:
+            for key in self.results:
+                if not keyword in key['keyword']:
+                    new_results.append(key)
+
+        return new_results
 
     def download_as_csv(self):
         """

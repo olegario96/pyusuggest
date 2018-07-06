@@ -1,5 +1,6 @@
 import os
 import pytest
+import random
 
 from pyusuggest import Ubersuggest
 from pyusuggest import GoogleAttributeError
@@ -8,7 +9,7 @@ from pyusuggest import NoKeyWordSupplied
 
 LOCALE_PT_BR = 'pt-br'
 KEYWORD = 'algorithm'
-FILTER = 'JAVA'
+FILTER = 'java'
 
 @pytest.fixture(scope='session')
 def ubersuggest():
@@ -132,6 +133,14 @@ def test_get_competition(ubersuggest):
 def test_download_as_csv(ubersuggest):
     ubersuggest.download_as_csv()
     assert os.path.isfile('./ubersuggest_' + KEYWORD + '.csv') == True
+
+def test_filter_results(ubersuggest):
+    results = ubersuggest.filter_results([FILTER])
+    assert (FILTER in random.choice(results)['keyword']) == True
+
+def test_filter_with_negative_keywords(ubersuggest):
+    results = ubersuggest.filter_with_negative_keywords([FILTER])
+    assert (FILTER in random.choice(results)['keyword']) == False
 
 def test_volume_not_found_message(ubersuggest):
     ubersuggest.set_keyword('gigantic search that wont find nothing')
