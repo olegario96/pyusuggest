@@ -1,3 +1,4 @@
+import os
 import pytest
 
 from pyusuggest import Ubersuggest
@@ -7,6 +8,7 @@ from pyusuggest import NoKeyWordSupplied
 
 LOCALE_PT_BR = 'pt-br'
 KEYWORD = 'algorithm'
+FILTER = 'JAVA'
 
 @pytest.fixture(scope='session')
 def ubersuggest():
@@ -81,17 +83,32 @@ def test_keyword_exception(ubersuggest):
 def test_look_up_exception_not_executed_on_volume(ubersuggest):
     with pytest.raises(LookupNotExecuted) as e:
         ubersuggest.get_volume()
-    assert str(e.value) == "Can not get volume without executing look up"
+    assert str(e.value) == 'Can not get volume without executing look up'
 
 def test_look_up_exception_not_executed_on_cpc(ubersuggest):
     with pytest.raises(LookupNotExecuted) as e:
         ubersuggest.get_cpc()
-    assert str(e.value) == "Can not get CPC without executing look up"
+    assert str(e.value) == 'Can not get CPC without executing look up'
 
 def test_look_up_exception_not_executed_on_cpc(ubersuggest):
     with pytest.raises(LookupNotExecuted) as e:
         ubersuggest.get_competition()
-    assert str(e.value) == "Can not get competition without executing look up"
+    assert str(e.value) == 'Can not get competition without executing look up'
+
+def test_look_up_exception_not_executed_on_filter(ubersuggest):
+    with pytest.raises(LookupNotExecuted) as e:
+        ubersuggest.filter_results(FILTER)
+    assert str(e.value) == 'Can not filter results without executing look up'
+
+def test_look_up_exception_not_executed_on_negative(ubersuggest):
+    with pytest.raises(LookupNotExecuted) as e:
+        ubersuggest.filter_with_negative_keywords(FILTER)
+    assert str(e.value) == 'Can not filter negative keywords without executing look up'
+
+def test_look_up_exception_not_executed_on_csv(ubersuggest):
+    with pytest.raises(LookupNotExecuted) as e:
+        ubersuggest.download_as_csv()
+    assert str(e.value) == 'Can not create csv file without executing look up'
 
 def test_look_up(ubersuggest):
     ubersuggest.set_google_keyword_planner(True)
@@ -112,13 +129,18 @@ def test_get_cpc(ubersuggest):
 def test_get_competition(ubersuggest):
     assert ubersuggest.get_competition() == 0.02
 
+def test_download_as_csv(ubersuggest):
+    ubersuggest.download_as_csv()
+    assert os.path.isfile('./ubersuggest_' + KEYWORD + '.csv') == True
+
 def test_volume_not_found_message(ubersuggest):
     ubersuggest.set_keyword('gigantic search that wont find nothing')
     ubersuggest.look_up()
-    assert ubersuggest.get_volume() == 'Ubersuggest could not return volume for this keyword'
+    assert ubersuggest.get_volume() == 0
 
 def test_cpc_not_found_message(ubersuggest):
-    assert ubersuggest.get_cpc() == 'Ubersuggest could not return CPC for this keyword'
+    assert ubersuggest.get_cpc() == 0
 
 def test_competition_not_found_message(ubersuggest):
-    assert ubersuggest.get_competition() == 'Ubersuggest could not return competition for this keyword'
+    assert ubersuggest.get_competition() == 0
+
