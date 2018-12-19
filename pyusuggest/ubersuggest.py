@@ -27,6 +27,7 @@ class Ubersuggest(object):
         self.language = self.get_language_from_locale(locale)
         self.country = self.get_country_from_locale(locale)
         self.results = ''
+        self.related_words = []
 
     def set_keyword(self, keyword):
         """
@@ -109,7 +110,9 @@ class Ubersuggest(object):
             raise NoKeyWordSupplied("A keyword must be supplied")
 
         url_formatted = Ubersuggest.QUERY_URL.format(self.keyword, self.language, self.country)
-        self.results = json.loads(requests.get(url_formatted).text).get('results').get('processed_keywords')
+        json_result = json.loads(requests.get(url_formatted).text)
+        self.results = json_result.get('results').get('processed_keywords')
+        self.related_results = json_result.get('results').get('unprocessed_keywords')
         if results >= len(self.results):
             return self.results
         else:
@@ -146,6 +149,13 @@ class Ubersuggest(object):
                     new_results.append(key)
 
         return new_results
+
+    def related_results(self):
+        """
+            Get words related to the search that are marked as "unprocessed_keywords"
+            in the JSON.
+        """
+        return self.related_results
 
     def download_as_csv(self):
         """
