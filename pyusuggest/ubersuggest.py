@@ -1,9 +1,9 @@
-from .exceptions import GoogleAttributeError
 from .exceptions import LookupNotExecuted
 from .exceptions import NoKeyWordSupplied
 
 import csv
 import json
+import os
 import requests
 
 class Ubersuggest(object):
@@ -14,9 +14,14 @@ class Ubersuggest(object):
     DEFAULT_LOCALE = 'en-us'
     #: Amount of results to be returned when query finishes.
     DEFAULT_RESULTS = 50
+    # Period to track keyword in last months
+    DEFATUL_NUMBER_MONTHS = 'ALL'
     #: URL target to send the request. Already pre-formatted
     QUERY_URL = 'https://dk1ecw0kik.execute-api.us-east-1.amazonaws.com/prod/query?query={}&language=' + \
                 '{}&country={}&google=http://www.google.com&service=i'
+
+    # Path to current working directory
+    PWD = os.getcwd()
 
     def __init__(self, keyword, locale=DEFAULT_LOCALE):
         """
@@ -105,10 +110,6 @@ class Ubersuggest(object):
             length of the results is less than the results param, so all
             results will be returned.
         """
-
-        if not self.keyword:
-            raise NoKeyWordSupplied("A keyword must be supplied")
-
         url_formatted = Ubersuggest.QUERY_URL.format(self.keyword, self.language, self.country)
         json_result = json.loads(requests.get(url_formatted).text)
         self.results = json_result.get('results').get('processed_keywords')
@@ -157,7 +158,29 @@ class Ubersuggest(object):
         """
         return self.related_results
 
-    def download_as_csv(self):
+    def get_monthly_statistics(self, period=DEFAULT_PERIOD):
+        """
+            Get the monthly statistics for each keyword in last months. This method
+            is only available after use the "look_up" is being executed. The period
+            passed as argument must be a integer. Will iterate through each keyword
+            and get its monthly statistics. If the period is greater than all
+            available months, will get all months. Return a dictionary in each
+            keyword maps its statistics in a list of dicts format.
+        """
+        if not self.results:
+            raise LookupNotExecuted('Can not get monthly results without executing look up')
+
+        monthly_statistics_per_word = {}
+        for result in self.results:
+            monthly_statistics = result.get('ms')
+            if period == DEFAULT_PERIOD or int(period) >= len(monthly_statistics):
+                monthly_statistics_per_word[result.get('keyword')] = monthly_statistics
+            else:
+                monthly_statistics_per_word[result.get('keyword')] = monthly_statistics[:period]
+
+        return monthly_statistics_per_word
+
+    def download_results_as_csv(self):
         """
             Create a csv file on the current path with data returned by the
             query. This method is only available after look_up be triggered.
@@ -167,9 +190,36 @@ class Ubersuggest(object):
 
         row = []
         header = ['Keyword', 'Search Volume', 'CPC', 'Competition']
-        csv_file = open('ubersuggest_' + self.keyword + '.csv', 'w')
+        csv_file = open(PWD + '/ubersuggest_' + self.keyword + '.csv', 'w')
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(['Keyword', 'Search Volume', 'CPC', 'Competition'])
+        csv_writer.writerow(header)
         for result in self.results:
             row = [result['keyword'], result['volume'], result['cpc'], result['competition']]
             csv_writer.writerow(row)
+
+        csv_file.close()
+
+    def download_monthly_statistics_as_csv(self, period=DEFAULT_PERIOD):
+        """
+            Creates a CSV file in the current working directory with the statistics
+            related to each keyword found during the search process. This method
+            is only available after the "look_up" method being triggered. The header
+            is created using a column for the keyword, year, month and how many
+            times that word has been searched.
+        """
+        if not self.results:
+            raise LookupNotExecuted('Can not get monthly results without executing look up')
+
+        row = []
+        header = ['keyword', 'year', 'month', 'count']
+        csv_file = opne(PWD + 'ubersuggest_' + self.keyword + 'monthly_statistics.csv', 'w')
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(header)
+        monthly_statistics_per_word = self.get_monthly_statistics(period)
+        for key in monthly_statistics_per_word:
+            for statistic in monthly_statistics_per_word.get(key):
+                csv_writer.writerow([key, statistic.get('year'), statistic.get('month'), statistic.get('count')])
+
+        csv_file.close()
+
+
