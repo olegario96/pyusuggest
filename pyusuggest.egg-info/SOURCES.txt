@@ -1,5 +1,7 @@
+README.md
 setup.py
 pyusuggest/__init__.py
+pyusuggest/exceptions.py
 pyusuggest/ubersuggest.py
 pyusuggest.egg-info/PKG-INFO
 pyusuggest.egg-info/SOURCES.txt

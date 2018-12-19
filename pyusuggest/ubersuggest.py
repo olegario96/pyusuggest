@@ -8,14 +8,14 @@ import requests
 
 class Ubersuggest(object):
     """
-        Ubersuggest implements a class that do requests to the service
+        TODO
     """
     #: The default locale in the class
     DEFAULT_LOCALE = 'en-us'
     #: Amount of results to be returned when query finishes.
     DEFAULT_RESULTS = 50
     # Period to track keyword in last months
-    DEFATUL_NUMBER_MONTHS = 'ALL'
+    DEFAULT_PERIOD = 'ALL'
     #: URL target to send the request. Already pre-formatted
     QUERY_URL = 'https://dk1ecw0kik.execute-api.us-east-1.amazonaws.com/prod/query?query={}&language=' + \
                 '{}&country={}&google=http://www.google.com&service=i'
@@ -32,13 +32,15 @@ class Ubersuggest(object):
         self.language = self.get_language_from_locale(locale)
         self.country = self.get_country_from_locale(locale)
         self.results = ''
-        self.related_words = []
+        self.unprocessed_keywords = []
 
     def set_keyword(self, keyword):
         """
           Set a new keyword for current instance. Will be used in the next call
           of look_up method.
         """
+        if ' ' in keyword:
+            keyword = '%20'.join(keyword.split())
         self.keyword = keyword
 
     def set_locale(self, locale=DEFAULT_LOCALE):
@@ -110,10 +112,13 @@ class Ubersuggest(object):
             length of the results is less than the results param, so all
             results will be returned.
         """
+        if not self.keyword:
+            raise NoKeyWordSupplied('A keyword or phrase must be supplied')
+
         url_formatted = Ubersuggest.QUERY_URL.format(self.keyword, self.language, self.country)
         json_result = json.loads(requests.get(url_formatted).text)
         self.results = json_result.get('results').get('processed_keywords')
-        self.related_results = json_result.get('results').get('unprocessed_keywords')
+        self.unprocessed_keywords = json_result.get('results').get('unprocessed_keywords')
         if results >= len(self.results):
             return self.results
         else:
@@ -151,12 +156,12 @@ class Ubersuggest(object):
 
         return new_results
 
-    def related_results(self):
+    def related_keywords(self):
         """
             Get words related to the search that are marked as "unprocessed_keywords"
             in the JSON.
         """
-        return self.related_results
+        return self.unprocessed_keywords
 
     def get_monthly_statistics(self, period=DEFAULT_PERIOD):
         """
@@ -173,8 +178,11 @@ class Ubersuggest(object):
         monthly_statistics_per_word = {}
         for result in self.results:
             monthly_statistics = result.get('ms')
-            if period == DEFAULT_PERIOD or int(period) >= len(monthly_statistics):
-                monthly_statistics_per_word[result.get('keyword')] = monthly_statistics
+            if period == Ubersuggest.DEFAULT_PERIOD or int(period) >= len(monthly_statistics):
+                if not monthly_statistics:
+                    monthly_statistics_per_word[result.get('keyword')] = []
+                else:
+                    monthly_statistics_per_word[result.get('keyword')] = monthly_statistics
             else:
                 monthly_statistics_per_word[result.get('keyword')] = monthly_statistics[:period]
 
@@ -190,7 +198,7 @@ class Ubersuggest(object):
 
         row = []
         header = ['Keyword', 'Search Volume', 'CPC', 'Competition']
-        csv_file = open(PWD + '/ubersuggest_' + self.keyword + '.csv', 'w')
+        csv_file = open(Ubersuggest.PWD + '/ubersuggest_' + self.keyword + '.csv', 'w')
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow(header)
         for result in self.results:
@@ -208,18 +216,17 @@ class Ubersuggest(object):
             times that word has been searched.
         """
         if not self.results:
-            raise LookupNotExecuted('Can not get monthly results without executing look up')
+            raise LookupNotExecuted('Can not create csv file without executing look up')
 
         row = []
         header = ['keyword', 'year', 'month', 'count']
-        csv_file = opne(PWD + 'ubersuggest_' + self.keyword + 'monthly_statistics.csv', 'w')
+        csv_file = open(Ubersuggest.PWD + '/ubersuggest_' + self.keyword + '_monthly_statistics.csv', 'w')
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow(header)
         monthly_statistics_per_word = self.get_monthly_statistics(period)
+
         for key in monthly_statistics_per_word:
             for statistic in monthly_statistics_per_word.get(key):
                 csv_writer.writerow([key, statistic.get('year'), statistic.get('month'), statistic.get('count')])
 
         csv_file.close()
-
-

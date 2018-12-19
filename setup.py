@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pyusuggest',
-      version='0.1',
+      version='1.0',
       description='API to integrate Ubersuggest with Python',
       url='https://github.com/Olegario96/pyusuggest',
       author='Gustavo Olegario',
