@@ -22,15 +22,6 @@ def test_default_result(ubersuggest):
 def test_keyword(ubersuggest):
     assert ubersuggest.keyword == KEYWORD
 
-def test_default_google_keyword_planner(ubersuggest):
-    assert ubersuggest.google_keyword_planner == True
-
-def test_default_google_suggest(ubersuggest):
-    assert ubersuggest.google_suggest == True
-
-def test_default_area(ubersuggest):
-    assert ubersuggest.area == Ubersuggest.AREA['web']
-
 def test_default_language(ubersuggest):
     assert ubersuggest.language == 'en'
 

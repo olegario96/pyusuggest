@@ -15,28 +15,17 @@ class Ubersuggest(object):
     #: Amount of results to be returned when query finishes.
     DEFAULT_RESULTS = 50
     #: URL target to send the request. Already pre-formatted
-    QUERY_URL = 'https://dk1ecw0kik.execute-api.us-east-1.amazonaws.com/prod/query?query={}&language={}&country={}&google=http://www.google.com&service=i'
-    #: Target area of the query. This options came from the own Ubersuggest
-    #: tool.
-    AREA = {
-        'web':      'Web',
-        'image':    'Image',
-        'shopping': 'Shopping',
-        'youtube':  'Youtube',
-        'news':     'News',
-    }
+    QUERY_URL = 'https://dk1ecw0kik.execute-api.us-east-1.amazonaws.com/prod/query?query={}&language=' + \
+                '{}&country={}&google=http://www.google.com&service=i'
 
-    def __init__(self, keyword, area=AREA['web'], locale=DEFAULT_LOCALE):
+    def __init__(self, keyword, locale=DEFAULT_LOCALE):
         """
             Create a class with necessary params to use Ubersuggest service
             and an attribute to store the result of the query
         """
         self.keyword = keyword
-        self.area = area
         self.language = self.get_language_from_locale(locale)
         self.country = self.get_country_from_locale(locale)
-        self.google_keyword_planner = True
-        self.google_suggest = True
         self.results = ''
 
     def set_keyword(self, keyword):
@@ -53,25 +42,6 @@ class Ubersuggest(object):
         self.language = self.get_language_from_locale(locale)
         self.country = self.get_country_from_locale(locale)
 
-    def set_area(self, area=AREA['web']):
-        """
-            Set a new target area for the query. Other options can be checked
-            at the top of the file.
-        """
-        self.area = area
-
-    def set_google_keyword_planner(self, boolean=True):
-        """
-            Set if query result must bring google keyword planner or not.
-        """
-        self.google_keyword_planner = boolean
-
-    def set_google_suggest(self, boolean=True):
-        """
-            Set if query result must bring google suggestions or not.
-        """
-        self.google_suggest = boolean
-
     def get_volume(self):
         """
             Get the number of searches about the current keyword. This
@@ -81,8 +51,8 @@ class Ubersuggest(object):
             raise LookupNotExecuted('Can not get volume without executing look up')
 
         for key in self.results:
-            if key['keyword'] == self.keyword and key['volume']:
-                return int(key['volume'])
+            if key.get('keyword') == self.keyword and key.get('volume'):
+                return int(key.get('volume'))
 
         return 0
 
@@ -95,8 +65,8 @@ class Ubersuggest(object):
             raise LookupNotExecuted('Can not get CPC without executing look up')
 
         for key in self.results:
-            if key['keyword'] == self.keyword and key['cpc']:
-                return float(key['cpc'])
+            if key.get('keyword') == self.keyword and key.get('cpc'):
+                return float(key.get('cpc'))
 
         return 0
 
@@ -109,8 +79,8 @@ class Ubersuggest(object):
             raise LookupNotExecuted('Can not get competition without executing look up')
 
         for key in self.results:
-            if key['keyword'] == self.keyword and key['competition']:
-                return float(key['competition'])
+            if key.get('keyword') == self.keyword and key.get('competition'):
+                return float(key.get('competition'))
 
         return 0
 
@@ -134,14 +104,12 @@ class Ubersuggest(object):
             length of the results is less than the results param, so all
             results will be returned.
         """
-        if not self.google_keyword_planner and not self.google_suggest:
-            raise GoogleAttributeError('At least, one of Google options must be set as True')
 
         if not self.keyword:
-            raise NoKeyWordSupplied('A keyword or phrase must be supplied')
+            raise NoKeyWordSupplied("A keyword must be supplied")
 
         url_formatted = Ubersuggest.QUERY_URL.format(self.keyword, self.language, self.country)
-        self.results = json.loads(requests.get(url_formatted).text)['results']['processed_keywords']
+        self.results = json.loads(requests.get(url_formatted).text).get('results').get('processed_keywords')
         if results >= len(self.results):
             return self.results
         else:
@@ -158,7 +126,7 @@ class Ubersuggest(object):
         new_results = []
         for filter in filters:
             for key in self.results:
-                if filter in key['keyword']:
+                if filter in key.get('keyword'):
                     new_results.append(key)
 
         return new_results
@@ -174,7 +142,7 @@ class Ubersuggest(object):
         new_results = []
         for keyword in negative_keywords:
             for key in self.results:
-                if not keyword in key['keyword']:
+                if not keyword in key.get('keyword'):
                     new_results.append(key)
 
         return new_results
