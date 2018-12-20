@@ -13,6 +13,6 @@ setup(name='pyusuggest',
       url='https://github.com/Olegario96/pyusuggest',
       author='Gustavo Olegario',
       author_email='gustavo-olegario@hotmail.com',
-      license='MIT',
+      license='BEER-WARE',
       packages=['pyusuggest'],
       zip_safe=False)
