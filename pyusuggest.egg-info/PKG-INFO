@@ -1,11 +1,11 @@
 Metadata-Version: 2.1
 Name: pyusuggest
-Version: 1.0.1
+Version: 1.0.2
 Summary: API to integrate Ubersuggest with Python
 Home-page: https://github.com/Olegario96/pyusuggest
 Author: Gustavo Olegario
 Author-email: gustavo-olegario@hotmail.com
-License: MIT
+License: BEER-WARE
 Description: # pyusuggest
         
         ## Introduction

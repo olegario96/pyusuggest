@@ -7,4 +7,5 @@ pyusuggest.egg-info/PKG-INFO
 pyusuggest.egg-info/SOURCES.txt
 pyusuggest.egg-info/dependency_links.txt
 pyusuggest.egg-info/not-zip-safe
+pyusuggest.egg-info/requires.txt
 pyusuggest.egg-info/top_level.txt
