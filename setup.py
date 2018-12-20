@@ -10,7 +10,7 @@ with open('requirements.txt') as f:
     required = f.read().splitlines()
 
 setup(name='pyusuggest',
-      version='1.0.3.1',
+      version='1.0.4',
       description='API to integrate Ubersuggest with Python',
       long_description=long_description,
       long_description_content_type='text/markdown',
