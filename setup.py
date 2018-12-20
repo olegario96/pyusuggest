@@ -1,4 +1,5 @@
 from os import path
+from setuptools import find_packages
 from setuptools import setup
 
 pwd = path.abspath(path.dirname(__file__))
@@ -17,6 +18,6 @@ setup(name='pyusuggest',
       author='Gustavo Olegario',
       author_email='gustavo-olegario@hotmail.com',
       license='BEER-WARE',
-      packages=['pyusuggest'],
+      packages=find_packages,
       install_requires=required,
       zip_safe=False)
