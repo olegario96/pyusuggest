@@ -5,6 +5,9 @@ pwd = path.abspath(path.dirname(__file__))
 with open(path.join(pwd, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
 setup(name='pyusuggest',
       version='1.0.1',
       description='API to integrate Ubersuggest with Python',
@@ -15,4 +18,5 @@ setup(name='pyusuggest',
       author_email='gustavo-olegario@hotmail.com',
       license='BEER-WARE',
       packages=['pyusuggest'],
+      install_requires=required,
       zip_safe=False)
