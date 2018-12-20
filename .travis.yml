@@ -1,2 +1,7 @@
 language: python
-os: unix
+python:
+  - "3.5"
+install:
+  pip install -r requirements.txt
+script:
+  ./tests.sh
