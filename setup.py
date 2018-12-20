@@ -10,7 +10,7 @@ with open('requirements.txt') as f:
     required = f.read().splitlines()
 
 setup(name='pyusuggest',
-      version='1.0.2',
+      version='1.0.3.1',
       description='API to integrate Ubersuggest with Python',
       long_description=long_description,
       long_description_content_type='text/markdown',
@@ -18,6 +18,6 @@ setup(name='pyusuggest',
       author='Gustavo Olegario',
       author_email='gustavo-olegario@hotmail.com',
       license='BEER-WARE',
-      packages=find_packages(),
+      packages=['pyusuggest'],
       install_requires=required,
       zip_safe=False)
