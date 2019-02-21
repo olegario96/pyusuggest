@@ -5,6 +5,7 @@ import random
 from pyusuggest import Ubersuggest
 from pyusuggest import LookupNotExecuted
 from pyusuggest import NoKeyWordSupplied
+from pyusuggest import TimeOutUbersuggest
 
 LOCALE_PT_BR = 'pt-br'
 KEYWORD_ALGORITHM = 'algorithm'
@@ -95,6 +96,13 @@ def test_look_up_exception_not_executed_on_statistics_csv(ubersuggest):
         ubersuggest.download_monthly_statistics_as_csv()
     assert str(e.value) == 'Can not create csv file without executing look up'
 
+def test_timeout_exception(ubersuggest):
+    with pytest.raises(TimeOutUbersuggest) as e:
+        ubersuggest.set_keyword(KEYWORD_ALGORITHM)
+        ubersuggest.look_up(tries=3)
+
+    assert str(e.value) == 'The server may be offline or too busy right now! Please try again later'
+
 def test_look_up(ubersuggest):
     ubersuggest.set_locale('en-us')
     ubersuggest.set_keyword(KEYWORD_ALGORITHM)
@@ -113,7 +121,6 @@ def test_download_as_csv(ubersuggest):
 def test_download_statistics_as_csv(ubersuggest):
     ubersuggest.download_monthly_statistics_as_csv()
     assert os.path.isfile('ubersuggest_' + KEYWORD_ALGORITHM + '_monthly_statistics.csv') == True
-
 
 def test_filter_results(ubersuggest):
     results = ubersuggest.filter_results([FILTER])
@@ -139,7 +146,7 @@ def test_get_related_results(ubersuggest):
     ubersuggest.set_keyword(KEYWORD_DATABASES)
     ubersuggest.look_up()
     unprocessed_keywords = ubersuggest.related_keywords()
-    assert ('database sql' in unprocessed_keywords) == True
+    assert ('database analyst' in unprocessed_keywords) == True
 
 def test_get_monthly_statistics(ubersuggest):
     ubersuggest.set_locale(LOCALE_PT_BR)

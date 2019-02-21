@@ -1,5 +1,6 @@
 from .exceptions import LookupNotExecuted
 from .exceptions import NoKeyWordSupplied
+from .exceptions import TimeOutUbersuggest
 
 import csv
 import json
@@ -104,25 +105,40 @@ class Ubersuggest(object):
         """
         return locale.lower().split('-')[1]
 
-    def look_up(self, results=DEFAULT_RESULTS):
+    def look_up(self, results=DEFAULT_RESULTS, tries=0):
         """
             Triggers the request for the Ubersuggest tool. At least, one google
             attribute must be set as True. Will format the query url and will
             return the results with same amount as passed as param. If the
             length of the results is less than the results param, so all
-            results will be returned.
+            results will be returned. The request is inside a while loop, because
+            sometimes the server may respond with a message saying that the
+            request timed out. After 3 attempts, if it was not possible
+            query the url, an exception will be throw. The tries param is used
+            for test only.
         """
         if not self.keyword:
             raise NoKeyWordSupplied('A keyword or phrase must be supplied')
 
         url_formatted = Ubersuggest.QUERY_URL.format(self.keyword, self.language, self.country)
-        json_result = json.loads(requests.get(url_formatted).text)
-        self.results = json_result.get('results').get('processed_keywords')
-        self.unprocessed_keywords = json_result.get('results').get('unprocessed_keywords')
-        if results >= len(self.results):
-            return self.results
-        else:
-            return self.results[:results]
+        success = False
+
+        while (tries < 3 and not success):
+            res = requests.get(url_formatted).text
+            if not json.loads(res).get('message') == 'Endpoint request timed out':
+                success = True
+            tries += 1
+
+        if success:
+            json_result = json.loads(res)
+            self.results = json_result.get('results').get('processed_keywords')
+            self.unprocessed_keywords = json_result.get('results').get('unprocessed_keywords')
+            if results >= len(self.results):
+                return self.results
+            else:
+                return self.results[:results]
+        elif tries == 3:
+            raise TimeOutUbersuggest('The server may be offline or too busy right now! Please try again later')
 
     def filter_results(self, filters):
         """
